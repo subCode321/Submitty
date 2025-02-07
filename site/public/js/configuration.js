@@ -88,3 +88,9 @@ function confirmSelfRegistration(element, needs_reg_sections) {
 
     return !element.checked ? true : confirm('Are you sure you want to enable self registration to this course? This allows ALL users (even those manually removed from the course) to register for this course.');
 }
+
+function confirmUnregister() {
+    if (confirm('Are you sure you want to unregister from this course?')) {
+        window.location.href = window.location.href + '/unregister_from_course';
+    }
+}

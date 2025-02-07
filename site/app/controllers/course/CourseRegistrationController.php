@@ -51,4 +51,31 @@ class CourseRegistrationController extends AbstractController {
         $instructor_ids = $this->core->getQueries()->getActiveUserIds(true, false, false, false, false);
         $this->notifyInstructors($this->core->getUser()->getId(), $term, $course, $instructor_ids);
     }
+
+    #[Route("/courses/{_semester}/{_course}/unregister_from_course")]
+    public function selfUnregister(string $term, string $course) {
+        $this->core->loadCourseConfig($term, $course);
+        $this->core->loadCourseDatabase();
+    
+        // Check if self-unregistration is allowed
+        if ($this->core->getQueries()->getSelfRegistrationType($term, $course) === 0) {
+            $this->core->addErrorMessage('Self unregistration is not allowed.');
+            
+            // Native PHP redirect
+            header('Location: ' . $this->core->buildUrl(['home']));
+            exit; // Important to stop script execution after a redirect
+        }
+    
+        $this->unregisterCourseUser($term, $course);
+        
+        // Redirect to course page
+        header('Location: ' . $this->core->buildCourseUrl());
+        exit;
+    }
+    public function unregisterCourseUser(string $term, string $course): void {
+        $this->core->getQueries()->unregisterCourseUser($this->core->getUser(), $term, $course);
+        $instructor_ids = $this->core->getQueries()->getActiveUserIds(true, false, false, false, false);
+    }
+
+
 }
